@@ -5,20 +5,21 @@ import io
 
 
 # Stałe
-META_URL = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/584"
+META_URL = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/622"
 GIOS_ARCHIVE_URL = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/"
 
 GIOS_ID = {
-    2014: '302',
-    2019: '322',
-    2024: '582'
-}
+    2015: '236', 
+    2018: '603', 
+    2021: '486', 
+    2024: '582'}
+
 
 GIOS_PM25_FILE = {
-    2014: '2014_PM2.5_1g.xlsx',
-    2019: '2019_PM25_1g.xlsx',
-    2024: '2024_PM25_1g.xlsx'
-}
+    2015: '2015_PM25_1g.xlsx', 
+    2018: '2018_PM25_1g.xlsx', 
+    2021: '2021_PM25_1g.xlsx', 
+    2024: '2024_PM25_1g.xlsx'}
 
 
 # Pobieranie archiwum GIOŚ
@@ -33,20 +34,18 @@ def download_gios_archive(year):
 
     return df
 
-
-
 # Czyszczenie danych
-def clean_data(df):
+def clean_data(df,year):
     df = df.set_index(0)
-
-    if {'Kod stanowiska', 'Jednostka', 'Nr'}.issubset(df.index):
-        df = df.drop([
-            'Wskaźnik', 'Kod stanowiska',
-            'Czas uśredniania', 'Jednostka', 'Nr'
-        ])
-    else:
+    
+    if year==2015:
         df = df.drop(['Wskaźnik', 'Czas uśredniania'])
-
+    
+    elif year==2018:
+        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Czas pomiaru'],axis=0)
+    else: 
+        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Kod stanowiska'],axis=0)
+    
     df.columns = df.iloc[0]
     df = df.iloc[1:]
     df.index = pd.to_datetime(df.index)
@@ -59,18 +58,15 @@ def clean_data(df):
     df.index.name = "Data poboru danych"
     return df
 
-
-# --------------------------------------------------
 # Metadane
-# --------------------------------------------------
 def download_metadata():
     # Pobieranie z URL:
-    # response = requests.get(META_URL)
-    # response.raise_for_status()
-    # with open("metadane.xlsx", "wb") as f:
-    #     f.write(response.content)
+    response = requests.get(META_URL)
+    response.raise_for_status()
+    with open("metadane_new.xlsx", "wb") as f:
+        f.write(response.content)
 
-    metadane = pd.read_excel("metadane.xlsx")
+    metadane = pd.read_excel("metadane_new.xlsx")
 
     cols = list(metadane.columns)
     cols[4] = 'Stary kod'
@@ -100,7 +96,7 @@ def download_all(years):
 
     for year in years:
         df = download_gios_archive(year)
-        df = clean_data(df)
+        df = clean_data(df,year)
         df = map_station_codes(df, mapping_dict)
         data[year] = df
 
