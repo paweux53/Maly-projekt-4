@@ -13,8 +13,7 @@ def test_monthly_mean(): # test dla średnich miesięcznych
     
     result = monthly_mean(df, [2021])
     
-    # sprawdzenie wartości dla stycznia
-    # Jan: 10+20+30=60/3=20
+    # sprawdzenie wartości 
     assert result.loc[(2021, 1), 'S1'] == 20
     assert result.loc[(2021, 1), 'S2'] == 30
 
