@@ -3,7 +3,7 @@ import pytest
 
 from Analysis import *
 
-def test_monthly_mean_jan(): # test dla średnich miesięcznych - styczeń
+def test_monthly_mean(): # test dla średnich miesięcznych
 
     idx = pd.date_range('2021-01-01', periods=4, freq='15D')
     df = pd.DataFrame({
