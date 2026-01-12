@@ -8,7 +8,7 @@ W tym repozytorium znajduje się plik ipynb - projekt_3.ipynb, który jest zmody
 Najważniejszą zmianą było przeniesienie części: pobierania danych, analizy danych, wizualizacji danych do odrębnych plików .py (w tej samej kolejności: DownloadClean.py, Analysis.py, Visualization.py) z których funkcje są importowane i po kolei odpalane w notatniku.
 Obecne są równierz testy dla każdego z plików .py, znajdujące się w folderze tests. 
 Są to: DownloadClean_test.py, Analysis_test.py, Visualization_test.py . 
-Znajduje się również plik .gitignore, README.md zawierający dokumentację, plik z metadanymi - metadane_new.xlsx oraz oryginalny notatnik dla małego projektu nr 1 - projekt_1_student.ipynb
+Znajduje się również plik .gitignore, README.md zawierający dokumentację i podział pracy, plik z metadanymi - metadane_new.xlsx oraz oryginalny notatnik dla małego projektu nr 1 - projekt_1_student.ipynb
 
 ### Pliki .py
 
@@ -60,6 +60,13 @@ Visualization_test.py zawiera: (utylizowany jest monkeypatch aby nie wyświetla�
 - projekt_3.ipynb - notatnik który dzięki funkcjom z plików .py, zawierającym poprawiony kod, wykonuje po kolei zadania małego projektu 1.
 - metdane_new.xlsx - plik z metadanymi.
 
-
-
+## Rozkład Pracy
+- zadanie 1 - Amelia Bańkowska
+- zadanie 2 - Amelia Bańkowska
+- zadanie 3 - Paweł Galek
+- zadanie 4 - Paweł Galek
+- zadanie 5 - Paweł Galek
+- zadanie 6 - Amelia Bańkowska
+- zadanie 7 - Amelia Bańkowska i Paweł Galek
+- zadanie 8 - Amelia Bańkowska i Paweł Galek + drużyny 3 i 5
     
