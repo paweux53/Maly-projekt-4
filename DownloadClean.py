@@ -34,29 +34,41 @@ def download_gios_archive(year):
 
     return df
 
-# Czyszczenie danych
-def clean_data(df,year):
+def clean_data(df, year):
+    # Ustaw pierwszy wiersz jako indeks
     df = df.set_index(0)
     
-    if year==2015:
+    # Usuwanie niepotrzebnych wierszy w zależności od roku
+    if year == 2015:
         df = df.drop(['Wskaźnik', 'Czas uśredniania'])
-    
-    elif year==2018:
-        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Czas pomiaru'],axis=0)
+    elif year == 2018:
+        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Czas pomiaru'], axis=0)
     else: 
-        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Kod stanowiska'],axis=0)
+        df = df.drop(['Nr','Wskaźnik','Czas uśredniania', 'Jednostka', 'Kod stanowiska'], axis=0)
     
+    # Ustawienie nagłówków kolumn
     df.columns = df.iloc[0]
     df = df.iloc[1:]
+    
+    # Konwersja indeksu na datetime
     df.index = pd.to_datetime(df.index)
 
-    df.index = [
-        idx - pd.Timedelta(seconds=1) if idx.hour == 0 else idx
-        for idx in df.index
-    ]
+    # Zaokrąglenie do sekund
+    df.index = df.index.round('s')
 
+    # Poprawne przesunięcie pomiarów o północy
+    mask = df.index.hour == 0
+    shifted_index = (df.index - pd.Timedelta(days=1)).normalize() + pd.Timedelta(hours=23, minutes=59, seconds=59)
+    
+    # Podmiana tylko dla wierszy z godziny 00:XX:XX
+    new_index = df.index.to_series()
+    new_index[mask] = shifted_index[mask]
+    df.index = pd.DatetimeIndex(new_index)
+    
     df.index.name = "Data poboru danych"
+    
     return df
+
 
 # Metadane
 def download_metadata():
