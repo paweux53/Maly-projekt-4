@@ -49,9 +49,6 @@ def clean_data(df,year):
     df.columns = df.iloc[0]
     df = df.iloc[1:]
     df.index = pd.to_datetime(df.index)
-    
-    # Zaokrąglenie do sekundy, aby uniknąć problemów z precyzją (drift w milisekundach)
-    df.index = df.index.round('s')
 
     df.index = [
         idx - pd.Timedelta(seconds=1) if idx.hour == 0 else idx
