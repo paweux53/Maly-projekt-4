@@ -8,7 +8,7 @@ W tym repozytorium znajduje się plik ipynb - projekt_3.ipynb, który jest zmody
 Najważniejszą zmianą było przeniesienie części: pobierania danych, analizy danych, wizualizacji danych do odrębnych plików .py (w tej samej kolejności: DownloadClean.py, Analysis.py, Visualization.py) z których funkcje są importowane i po kolei odpalane w notatniku.
 Obecne są równierz testy dla każdego z plików .py, znajdujące się w folderze tests. 
 Są to: DownloadClean_test.py, Analysis_test.py, Visualization_test.py . 
-Znajduje się również plik .gitignore, README.md zawierający dokumentację i podział pracy, plik z metadanymi - metadane_new.xlsx oraz oryginalny notatnik dla małego projektu nr 1 - projekt_1_student.ipynb
+Znajduje się również plik .gitignore, README.md zawierający dokumentację, podział pracy i informacje o niespodziance, plik z metadanymi - metadane_new.xlsx oraz oryginalny notatnik dla małego projektu nr 1 - projekt_1_student.ipynb
 
 ### Pliki .py
 
@@ -59,6 +59,10 @@ Visualization_test.py zawiera: (utylizowany jest monkeypatch aby nie wyświetla�
 - projekt_1_student.ipynb - oryginalny notatnik z małego projektu 1 z niepoprawionym kodem.
 - projekt_3.ipynb - notatnik który dzięki funkcjom z plików .py, zawierającym poprawiony kod, wykonuje po kolei zadania małego projektu 1.
 - metdane_new.xlsx - plik z metadanymi.
+
+## Niespodzianka
+
+Niespodzianka znajdowała się u drużyny nr5 w zadaniu 5 w 89 cellu - po odczytaniu danych jako string z kolumny PM2.5 w df dla roku 2018 była następująca linijka: " .str[::-1] ", która odwracała ten string, a następnie zmieniała przecinek na kropkę. Dodatkowo w interpretacji wykresu - by uzasadnić nieproporcjonalnie niskie lub wysokie słupki dla roku 2018 na wykresie, umieściliśmy zdanie: "Rok 2018 był rokiem z największą ilością przekroczeń w większości województw, można to zdarzenie skorelować z długotrwałym niżem, który unosił się w tym roku nad Polską z wyjątkiem wschodu kraju - stąd niskie słupki dla Podlasia i Lubelszczyzny." będące przysłowiową "bujdą na resorach". W momencie zmergowania naszego pull-requesta niespodzianka ta istniała w kodzie drużyny nr5, ale została usunięta wraz z ostatnim commitem grupy nr5, ale wcześniej wspomniane zdanie dalej widnieje w notatniku zespołu.
 
 ## Rozkład Pracy
 - zadanie 1 - Amelia Bańkowska
