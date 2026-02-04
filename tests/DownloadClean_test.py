@@ -3,7 +3,7 @@ import requests
 import zipfile
 import io
 
-from DownloadClean import *
+from src.projekt_3.DownloadClean import *
 
 def test_clean_data_2015(): # test dla roku 2015 - czy dobrze usuwane są niepotrzebne elementy
     df = pd.DataFrame({

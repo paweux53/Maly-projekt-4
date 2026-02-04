@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from Analysis import *
+from src.projekt_3.Analysis import *
 
 def test_monthly_mean(): # test dla średnich miesięcznych
 
