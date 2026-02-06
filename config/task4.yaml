@@ -1,0 +1,29 @@
+# lata 
+years: [2021, 2024]
+
+# miasta
+cities: ['Warszawa', 'Katowice']
+
+# ustawienia dla PM2.5
+pm25:
+
+  # normalizacja danych
+  normalize: false
+
+  # próg alarmowy dla PM2.5
+  threshold: 25
+
+# ustawienia dla PubMed
+pubmed:
+
+  # dane wyganae do ściągnięcia danych z PubMed
+  email: 'pg459392@students.mimuw.edu.pl'
+
+  # zapytania do PubMed
+  queries:
+
+    - 'PM2.5 AND Poland'
+
+    - 'PM2.5 health'
+
+    - 'PM2.5 respiratory diseases'

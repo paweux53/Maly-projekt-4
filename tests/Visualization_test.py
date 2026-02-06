@@ -7,7 +7,7 @@ import pandas as pd
 
 import pytest
 
-from src.projekt_3.Visualization import *
+from src.pm_2_5.projekt_3.Visualization import *
 
 def test_mean_pm25_plot(monkeypatch): # test dla funkcji mean_pm25_plot
 

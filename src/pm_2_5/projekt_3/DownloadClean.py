@@ -11,6 +11,7 @@ GIOS_ARCHIVE_URL = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/"
 GIOS_ID = {
     2015: '236', 
     2018: '603', 
+    2019: '322',
     2021: '486', 
     2024: '582'}
 
@@ -18,6 +19,7 @@ GIOS_ID = {
 GIOS_PM25_FILE = {
     2015: '2015_PM25_1g.xlsx', 
     2018: '2018_PM25_1g.xlsx', 
+    2019: '2019_PM25_1g.xlsx',
     2021: '2021_PM25_1g.xlsx', 
     2024: '2024_PM25_1g.xlsx'}
 
