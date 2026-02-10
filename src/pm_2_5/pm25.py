@@ -14,14 +14,11 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 
 def main():
 
-    # parsowanie argumentów
+    # parsowanie argumentów wejściowych
     parser = argparse.ArgumentParser(description='Analiza danych PM2.5')
-
     parser.add_argument("--config", type=str, default="config/task4.yaml",
                          help="Ścieżka do pliku konfiguracyjnego YAML") 
-
-    parser.add_argument('--years' , type=int, nargs='+',
-                         help='Lata do analizy danych PM2.5 (np. --years 2021 2024)')
+    parser.add_argument('--year' , type=int, help='Rok do analizy danych PM2.5 (np. --year 2024)')
 
     args = parser.parse_args()  
 
@@ -30,44 +27,46 @@ def main():
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    # określenie Zmiennych globalnych
-    CITIES = config['cities']
-    YEARS = args.years 
+    YEAR = args.year
+    if YEAR is None:
+        raise SystemExit("Provide --year YEAR")
 
-    # określenie katalogów
-    results = ROOT_DIR / 'results' / 'PM_2.5' / str(YEARS)
-    results.mkdir(parents=True, exist_ok=True)
+    # katalogi wynikowe per-year
+    results = ROOT_DIR / 'results' / 'pm25' / str(YEAR)
+    data_dir = results / 'data'
+    plots_dir = results / 'figures'
+    data_dir.mkdir(parents=True, exist_ok=True)
+    plots_dir.mkdir(parents=True, exist_ok=True)
 
-    data = results / 'data'
-    data.mkdir(parents=True, exist_ok=True)
-
-    plots = results / 'plots'
-    plots.mkdir(parents=True, exist_ok=True)
-
-    # pobieranie danych + czyszczenie + mapowanie
-    df = prepare_common_data(YEARS)
+    # pobieranie danych + czyszczenie + mapowanie dla pojedynczego roku
+    df = prepare_common_data([YEAR])
 
     # analiza danych i zapis do csv
-
-    df_monthly_mean = monthly_mean(df, YEARS)
-    df_monthly_mean.to_csv(data / 'pm25_monthly_mean.csv')
+    df_monthly_mean = monthly_mean(df, [YEAR])
+    df_monthly_mean.to_csv(data_dir / 'monthly_means.csv')
 
     df_daily_mean = daily_mean(df)
-    df_daily_mean.to_csv(data / 'pm25_daily_mean.csv')
+    df_daily_mean.to_csv(data_dir / 'daily_means.csv')
 
     df_days_above_norm = days_above_norm(df)
-    df_days_above_norm.to_csv(data / 'pm25_days_above_norm.csv')
+    df_days_above_norm.to_csv(data_dir / 'exceedance_days.csv')
 
-    # wizualizacja danych i zapis wykresów do png
-    
-    mean_pm25_plot = mean_pm25_plot(df_monthly_mean, YEARS)
-    mean_pm25_plot.savefig(plots / 'pm25_mean_pm25_plot.png')
+    # wizualizacje -> funkcje teraz zwracają fig
+    fig1 = mean_pm25_plot(df_monthly_mean, [YEAR])
+    fig1.savefig(plots_dir / 'pm25_mean_plot.png')
+    fig1.clf()
 
-    heatmap = heatmap(df_monthly_mean, YEARS)
-    heatmap.savefig(plots / 'pm25_heatmap.png')
+    fig2 = heatmap(df_monthly_mean, [YEAR])
+    fig2.savefig(plots_dir / 'pm25_heatmap.png')
+    fig2.clf()
 
-    grouped_barplot = grouped_barplot(df_days_above_norm)
-    grouped_barplot.savefig(plots / 'pm25_grouped_barplot.png')
+    fig3 = grouped_barplot(df_days_above_norm)
+    fig3.savefig(plots_dir / 'pm25_grouped_barplot.png')
+    fig3.clf()
+
+
+if __name__ == "__main__":
+    main()
 
 
 

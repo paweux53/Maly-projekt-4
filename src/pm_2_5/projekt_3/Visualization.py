@@ -3,7 +3,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import math
 import seaborn as sns
 
-def mean_pm25_plot(df,years):
+def mean_pm25_plot(df, years):
     # Wybieram odpowiednie miasta
     df_waw = df.xs('Warszawa', level='Miejscowość', axis=1)
     df_kat = df.xs('Katowice', level='Miejscowość', axis=1)
@@ -16,21 +16,22 @@ def mean_pm25_plot(df,years):
     waw_2014 =df_waw_mean.xs(2015, level='Rok')
     kat_2014 = df_kat.xs(2015, level='Rok')
     
-    plt.figure(figsize=(10,6))
+    fig = plt.figure(figsize=(10,6))
+    ax = fig.gca()
     
-    plt.plot(waw_2014.index, waw_2014.values, label="Warszawa 2015", marker='o')
-    plt.plot(waw_2024.index, waw_2024.values, label="Warszawa 2024", marker='o')
-    plt.plot(kat_2014.index, kat_2014.values, label="Katowice 2015", marker='s')
-    plt.plot(kat_2024.index, kat_2024.values, label="Katowice 2024", marker='s')
+    ax.plot(waw_2014.index, waw_2014.values, label="Warszawa 2015", marker='o')
+    ax.plot(waw_2024.index, waw_2024.values, label="Warszawa 2024", marker='o')
+    ax.plot(kat_2014.index, kat_2014.values, label="Katowice 2015", marker='s')
+    ax.plot(kat_2024.index, kat_2024.values, label="Katowice 2024", marker='s')
     
-    plt.xlabel("Miesiąc", fontsize=14)
-    plt.ylabel("Średnie PM2.5", fontsize=14)
-    plt.title("Trend miesięcznych stężeń PM2.5 (Warszawa vs Katowice, 2015 i 2024)", fontsize=18)
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    plt.xticks(range(1, 13))
-    plt.tight_layout()
-    plt.show()
+    ax.set_xlabel("Miesiąc", fontsize=14)
+    ax.set_ylabel("Średnie PM2.5", fontsize=14)
+    ax.set_title("Trend miesięcznych stężeń PM2.5 (Warszawa vs Katowice, 2015 i 2024)", fontsize=18)
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    ax.set_xticks(range(1, 13))
+    fig.tight_layout()
+    return fig
 
 
 def heatmap(df, years):
@@ -74,7 +75,6 @@ def heatmap(df, years):
         figsize=(15, 9),
         constrained_layout=True
     )
-    
     axes = axes.flatten()
     
     for i, city in enumerate(cities):
@@ -117,8 +117,8 @@ def heatmap(df, years):
         "Średnie miesięczne stężenia PM2.5 w miastach (2015, 2018, 2021, 2024)",
         fontsize=16
     )
-    
-    plt.show()
+    return fig
+
 
 def grouped_barplot(df):
     # Filtrujemy tylko 2024
@@ -145,15 +145,16 @@ def grouped_barplot(df):
     df_plot_long = df_plot_reset.melt(id_vars='Rok', var_name='station', value_name='days_exceeded')
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=(10,6))
+    fig = plt.figure(figsize=(10,6))
+    ax = fig.gca()
     
-    sns.barplot(data=df_plot_long, x='station', y='days_exceeded', hue='Rok')
+    sns.barplot(data=df_plot_long, x='station', y='days_exceeded', hue='Rok', ax=ax)
     
-    plt.xlabel('Station')
-    plt.ylabel('Number of days exceeded')
-    plt.title('Dni przekraczające normę dzienną według stacji i roku')
-    plt.xticks(rotation=45)
-    plt.legend(title='Year')
+    ax.set_xlabel('Station')
+    ax.set_ylabel('Number of days exceeded')
+    ax.set_title('Dni przekraczające normę dzienną według stacji i roku')
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    ax.legend(title='Year')
     
-    plt.tight_layout()
-    plt.show()
+    fig.tight_layout()
+    return fig
