@@ -1,7 +1,8 @@
 import pandas as pd
 from pathlib import Path
 import tempfile
-import os
+import pytest
+
 
 def test_pubmed_determinism():
     # przykład: wczytaj istniejący CSV z wynikami
@@ -9,7 +10,6 @@ def test_pubmed_determinism():
     
     if not csv_path.exists():
         # pomija jeśli nie ma danych
-        import pytest
         pytest.skip("pubmed_results.csv nie istnieje")
     
     df = pd.read_csv(csv_path)
@@ -31,12 +31,11 @@ def test_pubmed_determinism():
 
 
 def test_pubmed_aggregations():
-    
+
     journals_path = Path("results/literature/2024/top_journals.csv")
     summary_path = Path("results/literature/2024/summary_by_year.csv")
     
     if not journals_path.exists() or not summary_path.exists():
-        import pytest
         pytest.skip("Agregatowe pliki nie istnieją")
     
     journals_df = pd.read_csv(journals_path, index_col=0)
