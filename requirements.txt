@@ -5,3 +5,7 @@ seaborn
 requests
 openpyxl
 ipykernel
+Snakemake  
+Biopython  
+math
+numpy
