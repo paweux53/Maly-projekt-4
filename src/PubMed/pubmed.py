@@ -65,7 +65,7 @@ def main():
             mindate=str(year),
             maxdate=str(year),
             datetype="pdat",
-            retmax=config["pubmed"]["max_results"],
+            retmax=config["pubmed"].get("max_results", 100),
         )
 
         result = Entrez.read(handle)

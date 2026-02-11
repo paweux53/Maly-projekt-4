@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import zipfile
 import io
+from pathlib import Path
 
 
 # Stałe
@@ -22,6 +23,8 @@ GIOS_PM25_FILE = {
     2019: '2019_PM25_1g.xlsx',
     2021: '2021_PM25_1g.xlsx', 
     2024: '2024_PM25_1g.xlsx'}
+
+ROOT = Path(__file__).resolve().parents[3]
 
 
 # Pobieranie archiwum GIOŚ
@@ -77,10 +80,13 @@ def download_metadata():
     # Pobieranie z URL:
     response = requests.get(META_URL)
     response.raise_for_status()
-    with open("metadane_new.xlsx", "wb") as f:
+
+    metadata_file = ROOT / "raw_files" / "metadane.xlsx"
+    
+    with open(metadata_file, "wb") as f:
         f.write(response.content)
 
-    metadane = pd.read_excel("metadane_new.xlsx")
+    metadane = pd.read_excel(metadata_file)
 
     cols = list(metadane.columns)
     cols[4] = 'Stary kod'
@@ -159,8 +165,9 @@ def prepare_common_data(years):
     # Zapis DataFrame do pliku
     lata = "_".join(map(str, years))
     tytul = f"data_{lata}.csv"
-    df_all.to_csv(tytul, index=True)
 
-    print(f"Zapisano do pliku: {tytul}")
+    file_path = ROOT / "raw_files" / tytul
+
+    df_all.to_csv(file_path, index=True)
 
     return df_all

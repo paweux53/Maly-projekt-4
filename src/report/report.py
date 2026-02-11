@@ -1,5 +1,4 @@
 # importy
-
 import argparse
 import yaml
 import pandas as pd
@@ -19,7 +18,6 @@ def safe_read_csv(path):
 
 
 def main():
-
     # parsowanie argumentów wejściowych
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -39,7 +37,7 @@ def main():
     output_dir = ROOT / "results"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # budowa treści raportu (lista linii)
+    # budowa treści raportu - lista linii
     lines = []
     lines.append(f"# Raport PM2.5 i analiza literatury dla lat {', '.join(map(str, years))}\n\n")
     lines.append("Raport wygenerowany automatycznie.\n\n")
@@ -51,26 +49,44 @@ def main():
     for year in years:
         path = ROOT / "results" / "pm25" / str(year) / "data" / "exceedance_days.csv"
         df = safe_read_csv(path)
+
         if df is None or df.empty:
             continue
+        
+        # ustawiamy indeks na pierwszą kolumnę, aby ułatwić dostęp do danych
+        df = df.set_index(df.columns[0])
+
+        # transponujemy
+        df = df.T
+        
         sample = df.sample(n=min(15, len(df)), random_state=42)
+
+
         for _, row in sample.iterrows():
+
+            
             # próbujemy różne klucze/być odporni na formaty
-            city = row.get('City') if isinstance(row, dict) else (row.get('city') if 'city' in row else None)
+            city = row.get('Miejscowość') if isinstance(row, dict) else (row.get('Miejscowość') if 'Miejscowość' in row else None)
+
             if city is None:
                 # fallback: spróbuj kolumny 'Miejscowość' lub pierwszy element
                 city = row.get('Miejscowość', None) if isinstance(row, dict) else (row.get('Miejscowość', '-') if 'Miejscowość' in row else '-')
             # liczba dni - różne możliwe nazwy
             days = None
+
+            
             for key in ['count', 'value', str(year), 'days', 'days_exceeded']:
                 days = row.get(key, None) if isinstance(row, dict) else (row.get(key) if key in row else None)
+
                 if days is not None:
                     break
+
             if days is None:
                 # jako ostateczność pobierz pierwszy element wartości
-                vals = list(row.values()) if hasattr(row, "values") else []
+                vals = list(row.values) if hasattr(row, "values") else []
                 days = vals[0] if vals else '-'
-            lines.append(f"| {year} | {city or '-'} | {days} |\n")
+            
+            lines.append(f"| {year} | {city} | {days} |\n")
 
     # liczba publikacji (podsumowanie roczne)
     lines.append("\n## Liczba publikacji\n\n")

@@ -9,3 +9,4 @@ Snakemake
 Biopython  
 math
 numpy
+Bio

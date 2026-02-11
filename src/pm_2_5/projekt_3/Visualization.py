@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import math
 import seaborn as sns
+import pandas as pd
 
 def mean_pm25_plot(df, years):
     # Wybieram odpowiednie miasta
@@ -9,24 +10,28 @@ def mean_pm25_plot(df, years):
     df_kat = df.xs('Katowice', level='Miejscowość', axis=1)
     
     df_waw_mean = df_waw.mean(axis=1)
+    df_kat_mean = df_kat.mean(axis=1)
 
-    # Wybieram odpowiedni rok i miasto
-    waw_2024 = df_waw_mean.xs(2024, level='Rok')
-    kat_2024 = df_kat.xs(2024, level='Rok')
-    waw_2014 =df_waw_mean.xs(2015, level='Rok')
-    kat_2014 = df_kat.xs(2015, level='Rok')
+    # Filter available years from the data
+    available_years = sorted(df_waw_mean.index.get_level_values('Rok').unique())
+    years_to_plot = [y for y in years if y in available_years]
+    
+    if not years_to_plot:
+        raise ValueError(f"No requested years {years} found in data. Available: {available_years}")
     
     fig = plt.figure(figsize=(10,6))
     ax = fig.gca()
     
-    ax.plot(waw_2014.index, waw_2014.values, label="Warszawa 2015", marker='o')
-    ax.plot(waw_2024.index, waw_2024.values, label="Warszawa 2024", marker='o')
-    ax.plot(kat_2014.index, kat_2014.values, label="Katowice 2015", marker='s')
-    ax.plot(kat_2024.index, kat_2024.values, label="Katowice 2024", marker='s')
+    for year in years_to_plot:
+        waw_data = df_waw_mean.xs(year, level='Rok')
+        kat_data = df_kat_mean.xs(year, level='Rok')
+        
+        ax.plot(waw_data.index, waw_data.values, label=f"Warszawa {year}", marker='o')
+        ax.plot(kat_data.index, kat_data.values, label=f"Katowice {year}", marker='s')
     
     ax.set_xlabel("Miesiąc", fontsize=14)
     ax.set_ylabel("Średnie PM2.5", fontsize=14)
-    ax.set_title("Trend miesięcznych stężeń PM2.5 (Warszawa vs Katowice, 2015 i 2024)", fontsize=18)
+    ax.set_title("Trend miesięcznych stężeń PM2.5 (Warszawa vs Katowice)", fontsize=18)
     ax.grid(True, alpha=0.3)
     ax.legend()
     ax.set_xticks(range(1, 13))
@@ -35,19 +40,34 @@ def mean_pm25_plot(df, years):
 
 
 def heatmap(df, years):
-    # grupowanie po mieście
-    df_city_month = df.groupby(level='Miejscowość', axis=1).mean()
+    # grupowanie po mieście 
+    matrix_dict = {}
     
-    
-    matrix_dict = {} # słownik na macierze dla poszczególnych miast
-    for city in df_city_month.columns:
-        matrix = df_city_month[city].unstack(level='Miesiąc')
-        matrix = matrix.reindex(index=years, columns=range(1, 13))  # reindeksacja, by mieć pewność, że wszystkie lata i miesiące są obecne
-        matrix_dict[city] = matrix
+    # Iteruj po miastach w DataFrame
+    for city in df.columns.get_level_values('Miejscowość').unique():
+        df_city = df.xs(city, level='Miejscowość', axis=1)
+        
+        # Unstack to create Year x Month matrix
+        matrix = df_city.unstack(level='Miesiąc')
+        
+        # Flatten MultiIndex columns to single level
+        if isinstance(matrix.columns, pd.MultiIndex):
+            matrix.columns = matrix.columns.get_level_values(-1)
+        
+        # Remove duplicate columns by keeping only unique months
+        matrix = matrix.loc[:, ~matrix.columns.duplicated(keep='first')]
+        
+        available_years = sorted(matrix.index.unique())
+        years_to_plot = [y for y in years if y in available_years]
+        
+        if years_to_plot:
+            # Reindex rows only, keep existing columns
+            matrix = matrix.reindex(index=years_to_plot)
+            matrix_dict[city] = matrix
     
     # ustalenie globalnego maksima i minima
-    global_min = df_city_month.min().min()
-    global_max = df_city_month.max().max()
+    global_min = df.min().min()
+    global_max = df.max().max()
     
     # Custom mapa kolorów 
     custom_cmap = LinearSegmentedColormap.from_list(
@@ -91,8 +111,9 @@ def heatmap(df, years):
         ax.set_title(city, fontsize=10)
         ax.set_xticks(range(12))
         ax.set_xticklabels(range(1, 13), fontsize=8)
-        ax.set_yticks(range(len(years)))
-        ax.set_yticklabels(years, fontsize=8)
+        available_years = sorted(matrix_dict[city].index.unique())
+        ax.set_yticks(range(len(available_years)))
+        ax.set_yticklabels(available_years, fontsize=8)
 
         # Podpisanie osi wykresu 
         ax.set_xlabel("Miesiąc", fontsize=8)
@@ -121,14 +142,20 @@ def heatmap(df, years):
 
 
 def grouped_barplot(df):
-    # Filtrujemy tylko 2024
-    df2024 = df.loc[2024]
+    # Get available years dynamically
+    available_years = sorted(df.index.unique())
+    if not available_years:
+        raise ValueError("No data available in dataframe")
+    
+    # Use the latest available year instead of hardcoded 2024
+    year_to_plot = available_years[-1]
+    df_year = df.loc[year_to_plot]
     
     # 3 stacje z najmniejszą liczbą dni
-    bottom3 = df2024.nsmallest(3)
+    bottom3 = df_year.nsmallest(3)
     
     # 3 stacje z największą liczbą dni
-    top3 = df2024.nlargest(3)
+    top3 = df_year.nlargest(3)
     
     # Lista interesujących stacji
     stations_of_interest = bottom3.index.tolist() + top3.index.tolist()
